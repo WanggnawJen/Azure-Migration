@@ -1,0 +1,40 @@
+<<< Using On-pre Machine  =====>   Windows Server 2012 R2  Full patched   [192.168.2.132]  >>>
+
+Azure migrate appliance  ===>  Discovery of servers	and applications	[192.168.4.110]
+
+Azure replication appliance ===>  Discovering, Configuration and Process for replication of servers	[CS + PS - 192.168.2.133]
+[ Only VM/Server discovered by this Replication appliance/server can be replicated/migrated!!! ]
+
+Microsoft Azure Site Recovery Agent  ===>  Install in each server to get disovered by Replication appliance  [Mobility Service agent ASR - 192.168.2.132]
+["Microsoft Azure Site Recovery (ASR Unified) Agent"  can be taken from "Azure Replication appliance/server" folder  ==>  "C:\ProgramData\ASR\home\svsystems\pushinstallsvc\repository"]
+[Check for available and supported OS version ===> supported version of Agent]
+
+Microsoft ASR Installation in Windows VM to be migrated
+========================================================
+cd C:\Temp
+ren Microsoft-ASR_UA*Windows*release.exe MobilityServiceInstaller.exe
+MobilityServiceInstaller.exe /q /x:C:\Temp\Extracted
+cd C:\Temp\Extracted
+
+UnifiedAgent.exe /Role "MS" /InstallLocation "C:\Program Files (x86)\Microsoft Azure Site Recovery" /Platform "VmWare" /Silent  /CSType CSLegacy
+
+cd C:\Program Files (x86)\Microsoft Azure Site Recovery\agent
+UnifiedAgentConfigurator.exe  /CSEndPoint <CSIP> /PassphraseFilePath <PassphraseFilePath>
+
+
+Passphrase File Generation in Replication Server/appliance
+===========================================================
+Open ===>  "Cspsconfigtool"
+Check in Tab ===>  "ConfigurationDetails"
+Actual Generation ===>  "[ASR Install]\home\svsystems\bin\genpassphrase.exe  -n"
+
+
+
+Azure migrate appliance  ====>   Refresh services   ====>  Restart services in On-pre appliance server for re-discovery of items in physical servers
+
+
+Replication >>>>     [192.168.2.132 - VM] ====>  [192.168.2.133 - RepSvr]  ==================>   [Azure Cloud - Region]
+
+Test Migration  ====>   Clean up Test Migration   =====>   Migrate to Azure Cloud
+
+Final Azure VM ===>  Update necessary Azure Virtual network/configuration (Public IP, NSG Inbound Rule, Azure VM Agent install)
